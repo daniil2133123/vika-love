@@ -11,13 +11,18 @@ export async function POST(req: Request) {
       const messageId = callbackQuery.message.message_id;
       const token = process.env.TELEGRAM_BOT_TOKEN!;
 
-      let replyText = "";
-      if (data === "accept") {
-        replyText = "🤗 Обнимашки приняты! Я тоже тебя крепко обнимаю ❤️";
-      } else if (data === "decline") {
+            let replyText = "";
+      
+      if (data.startsWith("accept")) {
+        if (data.includes("hug")) {
+          replyText = "🤗 Обнимашки приняты! Я тоже тебя крепко обнимаю ❤️";
+        } else if (data.includes("kiss")) {
+          replyText = "💋 Поцелуй принят! Обнимаю тебя нежно-нежно 😘";
+        }
+      } else if (data.startsWith("decline")) {
         replyText = "😢 Ну ладно... Но я всё равно тебя люблю ❤️";
       }
-
+      
       // Обязательный ответ Телеграму (чтобы убрать "крутилку" на кнопке)
       await fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery`, {
         method: 'POST',
