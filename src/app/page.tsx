@@ -36,7 +36,7 @@ function LovePageContent() {
   const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    const startDate = new Date(2026, 10, 9, 0, 0).getTime(); 
+    const startDate = new Date(2026, 9, 9, 0, 0).getTime(); 
     const interval = setInterval(() => {
       const now = new Date().getTime();
       const diff = Math.abs(now - startDate); // Вот тут Math.abs
