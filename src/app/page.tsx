@@ -1,41 +1,44 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Heart, Camera, Gift, RefreshCw, Smile, X, Mail, MailOpen, CloudRain, Sparkles } from "lucide-react";
 
-// --- ТЕКСТЫ ПИСЕМ (Пиши от души) ---
+// --- ТВОИ ПИСЬМА ---
 const LETTERS = {
-    miss: `Привет, моя любимая Вика.
-Если ты это читаешь, значит, ты скучаешь. Поверь, я в этот момент скучаю не меньше твоего. Я тоже хочу
-крепко-крепко тебя обнять и поцеловать.Время летит быстро, и ты не заметишь, как мы уже вместе идем за
-ручку и гуляем. Но знай: если мы не рядом, это не значит, что ты не в моих мыслях. Каждый день, когда 
-мы не вместе, я вспоминаю твои щечки,которые затискал бы, милые губки, которые поцеловал бы, твою улы
-бку и твои глазки.Ты — самый важный человечек в моей жизни и самый яркий лучик света в моих глазах.
+  miss: `Привет, моя любимая Вика.
+Если ты это читаешь, значит, ты скучаешь. Поверь, я в этот момент скучаю не меньше твоего. Я тоже хочу крепко-крепко тебя обнять и поцеловать.
+
+Время летит быстро, и ты не заметишь, как мы уже вместе идем за ручку и гуляем. Но знай: если мы не рядом, это не значит, что ты не в моих мыслях. Каждый день, когда мы не вместе, я вспоминаю твои щечки, которые затискал бы, милые губки, которые поцеловал бы, твою улыбку и твои глазки.
+
+Ты — самый важный человечек в моей жизни и самый яркий лучик света в моих глазах.
 
 Люблю тебя бесконечно. Твой Даня. ❤️`,
 
-  sad: `Привет, любимая.
-Если ты это читаешь, значит, тебе грустно или что-то не получается. Просто знай: у тебя есть тот, кт
-о тебя очень любит и ценит.Заенька, запомни — ты самая сильная и умная девушка, которую я встречал. 
-У тебя обязательно всё получится!И не забывай, что у тебя есть я. Я помогу тебе в любой ситуации и в
-сегда буду твоей опорой.Просто верь в себя, любимая, и никогда не сдавайся.
+  sad: `Привет, любимая. 
+Если ты это читаешь, значит, тебе грустно или что-то не получается. Просто знай: у тебя есть тот, кто тебя очень любит и ценит.
+
+Заенька, запомни — ты самая сильная и умная девушка, которую я встречал. У тебя обязательно всё получится! И не забывай, что у тебя есть я. Я помогу тебе в любой ситуации и всегда буду твоей опорой. 
+
+Просто верь в себя, любимая, и никогда не сдавайся. 
 
 Люблю тебя. Твой Даня 🤗`,
 
-    just: `Привет, солнышко!
-Просто решил напомнить тебе, что ты — лучшее, что случилось со мной за всё время. У тебя самые прекр
-асные глазки, самая потрясающая и белоснежная улыбка, самые шелковистые волосы и прекрасные милые ру
-чки. Просто знай это.
+  just: `Привет, солнышко!
+Просто решил напомнить тебе, что ты — лучшее, что случилось со мной за всё время. У тебя самые прекрасные глазки, самая потрясающая и белоснежная улыбка, самые шелковистые волосы и прекрасные милые ручки. Просто знай это.
 
 Спасибо тебе за всё. 
 Люблю безумно. Твой Даня ❤️`,
 };
 
-export default function LovePage() {
+function LovePageContent() {
+  const searchParams = useSearchParams();
+  const user = searchParams.get("user"); // Читаем "vika" или "danya" из ссылки
+
   // --- 1. ТАЙМЕР ---
   const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    const startDate = new Date(2026, 9, 9, 0, 0).getTime(); 
+    const startDate = new Date(2026, 10, 9, 0, 0).getTime(); // 9 ноября 2026 (месяцы с 0, поэтому 10)
     const interval = setInterval(() => {
       const now = new Date().getTime();
       const diff = now - startDate;
@@ -56,7 +59,8 @@ export default function LovePage() {
     "За то, что ты рядом, даже когда расстояние.",
     "За то, как ты злишься в Роблоксе (это мило).",
     "За твои глаза.",
-    "За то, что ты выбрала именно меня."
+    "За то, что ты выбрала именно меня.",
+    "За наши ночные разговоры."
   ];
   const [currentReason, setCurrentReason] = useState("Нажми на кнопку, чтобы узнать...");
   const generateReason = () => {
@@ -76,7 +80,7 @@ export default function LovePage() {
   const [burstPhoto, setBurstPhoto] = useState<string | null>(null);
 
   const triggerAction = async (action: "hug" | "kiss") => {
-    const hugPhotos = ["/hug1.jpg", "/hug2.jpg", "/hug3.jpg"];
+    const hugPhotos = ["/hug1.jpg", "/hug2.jpg",];
     const kissPhotos = ["/kiss1.jpg", "/kiss2.jpg", "/kiss3.jpg"];
     const photos = action === "hug" ? hugPhotos : kissPhotos;
     const randomPhoto = photos[Math.floor(Math.random() * photos.length)];
@@ -85,11 +89,14 @@ export default function LovePage() {
     setBurstAction(action);
     setTimeout(() => { setBurstAction(null); setBurstPhoto(null); }, 3000);
 
+    // ЛОГИКА ОТПРАВКИ: Если зашла Вика, отправляем Дане. И наоборот.
+    const target = user === "vika" ? "danya" : "vika";
+
     try {
       await fetch('/api/telegram-love', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action })
+        body: JSON.stringify({ action, target })
       });
     } catch (e) { console.log("Ошибка отправки", e); }
   };
@@ -98,10 +105,11 @@ export default function LovePage() {
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
   const [isBonusRevealed, setIsBonusRevealed] = useState(false);
 
+  // ТВОИ ФОТОГРАФИИ
   const photos = [
     { url: "/photo4.jpg", caption: "Мой личный гоблин", description: "Ты можешь прятаться в капюшон, но твои глаза все равно выдают, как сильно ты меня любишь.", bonus: "🎁 Бонус: Купон на один расслабляющий массаж спины." },
     { url: "/photo2.jpg", caption: "Тот самый вечер", description: "Ты была самой красивой в тот момент. Я смотрел на тебя и понимал, как мне повезло.", bonus: "🎁 Бонус: Купон на совместный просмотр любого фильма." },
-    { url: "/photo6.jpg", caption: "Осторожно, чихуахуа", description: "Даже когда ты злишься или показываешь фак, я все равно без ума от тебя.", bonus: "🎁 Бонус: Купон на 10 минут крепких обнимашек!" },
+    { url: "/photo6.jpg", caption: "осторожно чихуахуа", description: "Даже когда ты злишься или показываешь фак, я все равно без ума от тебя.", bonus: "🎁 Бонус: Купон на 10 минут крепких обнимашек!" },
     { url: "/photo1.jpg", caption: "Твой взгляд", description: "Обожаю, когда ты так смотришь. В этот момент я готов на все.", bonus: "🎁 Бонус: 10 комплиментов тебе." },
     { url: "/photo7.jpg", caption: "Твои глаза", description: "В этих глазах можно утонуть.", bonus: "🎁 Бонус: фотограф на час." },
     { url: "/photo3.jpg", caption: "Мой любимый фон", description: "Ты делаешь любой кадр лучше.", bonus: "🎁 Бонус: Любое твое желание." },
@@ -116,12 +124,12 @@ export default function LovePage() {
 
   const fullText = selectedLetter ? LETTERS[selectedLetter] : "";
 
-    useEffect(() => {
+  useEffect(() => {
     if (selectedLetter && textIndex < fullText.length) {
       const timer = setTimeout(() => {
         setPrintedText(fullText.substring(0, textIndex + 1));
         setTextIndex((prev) => prev + 1);
-      }, 25); // <-- ВОТ ЭТА ЦИФРА
+      }, 15); // Ускорили печать
       return () => clearTimeout(timer);
     }
   }, [selectedLetter, textIndex, fullText]);
@@ -230,7 +238,7 @@ export default function LovePage() {
         </div>
       </section>
 
-      {/* --- СЕКЦИЯ ПИСЕМ (Обновленная) --- */}
+      {/* СЕКЦИЯ ПИСЕМ */}
       <section className="py-20 px-4 flex flex-col items-center justify-center relative z-10 border-t border-white/5">
         <div className="text-center mb-10">
           <h2 className="text-2xl md:text-3xl font-bold text-white">Послания для тебя</h2>
@@ -238,7 +246,6 @@ export default function LovePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full">
-          {/* Письмо 1: Скучаешь */}
           <button onClick={() => openLetter("miss")} className="group bg-white/5 hover:bg-white/10 border border-white/10 p-6 rounded-3xl transition-all hover:-translate-y-2 flex flex-col items-center text-center">
             <div className="w-16 h-16 bg-pink-500/20 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <Mail className="text-pink-400 w-8 h-8" />
@@ -247,7 +254,6 @@ export default function LovePage() {
             <p className="text-xs text-pink-300/60">Прочитай, если меня нет рядом</p>
           </button>
 
-          {/* Письмо 2: Грустно */}
           <button onClick={() => openLetter("sad")} className="group bg-white/5 hover:bg-white/10 border border-white/10 p-6 rounded-3xl transition-all hover:-translate-y-2 flex flex-col items-center text-center">
             <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <CloudRain className="text-blue-400 w-8 h-8" />
@@ -256,7 +262,6 @@ export default function LovePage() {
             <p className="text-xs text-pink-300/60">Если нужна поддержка</p>
           </button>
 
-          {/* Письмо 3: Просто так */}
           <button onClick={() => openLetter("just")} className="group bg-white/5 hover:bg-white/10 border border-white/10 p-6 rounded-3xl transition-all hover:-translate-y-2 flex flex-col items-center text-center">
             <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <Sparkles className="text-purple-400 w-8 h-8" />
@@ -287,7 +292,7 @@ export default function LovePage() {
         </div>
       )}
 
-            {/* МОДАЛКА ПИСЕМ */}
+      {/* МОДАЛКА ПИСЕМ */}
       {selectedLetter && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 animate-in fade-in duration-500" onClick={() => setSelectedLetter(null)}>
           <div className="relative max-w-2xl w-full bg-[#120a14] border border-pink-500/30 p-8 md:p-12 rounded-3xl shadow-[0_0_50px_rgba(236,72,153,0.2)] max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
@@ -296,8 +301,6 @@ export default function LovePage() {
               <MailOpen className="text-pink-500 w-12 h-12 mb-4" />
               <h3 className="text-2xl font-serif italic text-pink-300">Открытка от Дани...</h3>
             </div>
-
-            {/* ВОТ ТУТ ИЗМЕНЕНИЯ (клик по тексту и подсказка) */}
             <div 
               className="text-pink-100/90 leading-loose text-base md:text-lg whitespace-pre-wrap font-serif cursor-pointer"
               onClick={() => {
@@ -310,17 +313,22 @@ export default function LovePage() {
               {printedText}
               {textIndex < fullText.length && <span className="inline-block w-2 h-5 bg-pink-500 ml-1 animate-pulse"></span>}
             </div>
-            
             {textIndex < fullText.length && (
-              <p className="text-center text-xs text-pink-500/50 mt-6 animate-pulse">
-                (Нажми на текст, чтобы показать всё сразу)
-              </p>
+              <p className="text-center text-xs text-pink-500/50 mt-6 animate-pulse">(Нажми на текст, чтобы показать всё сразу)</p>
             )}
-
           </div>
         </div>
       )}
 
     </div>
+  );
+}
+
+// ОБЯЗАТЕЛЬНАЯ ОБЕРТКА ДЛЯ NEXT.JS (чтобы useSearchParams работал)
+export default function LovePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black text-pink-500 flex items-center justify-center">Загрузка...</div>}>
+      <LovePageContent />
+    </Suspense>
   );
 }

@@ -15,14 +15,14 @@ export async function POST(req: Request) {
       
       if (data.startsWith("accept")) {
         if (data.includes("hug")) {
-          replyText = "🤗 Обнимашки приняты! Я тоже тебя крепко обнимаю ❤️";
+          replyText = "🤗 крепко крепко обнимаю тебя ❤️";
         } else if (data.includes("kiss")) {
-          replyText = "💋 Поцелуй принят! Обнимаю тебя нежно-нежно 😘";
+          replyText = "💋 поцеловал тебя. люблю😘";
         }
       } else if (data.startsWith("decline")) {
-        replyText = "😢 Ну ладно... Но я всё равно тебя люблю ❤️";
+        replyText = "😢 ты чо ахуела?";
       }
-      
+
       // Обязательный ответ Телеграму (чтобы убрать "крутилку" на кнопке)
       await fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery`, {
         method: 'POST',
