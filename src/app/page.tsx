@@ -3,7 +3,6 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Heart, Camera, Gift, RefreshCw, Smile, X, Mail, MailOpen, CloudRain, Sparkles } from "lucide-react";
 
-// --- ТВОИ ПИСЬМА ---
 const LETTERS = {
   miss: `Привет, моя любимая Вика.
 Если ты это читаешь, значит, ты скучаешь. Поверь, я в этот момент скучаю не меньше твоего. Я тоже хочу крепко-крепко тебя обнять и поцеловать.
@@ -32,16 +31,15 @@ const LETTERS = {
 
 function LovePageContent() {
   const searchParams = useSearchParams();
-  const user = searchParams.get("user"); // Читаем "vika" или "danya" из ссылки
+  const user = searchParams.get("user");
 
-  // --- 1. ТАЙМЕР ---
   const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    const startDate = new Date(2026, 10, 9, 0, 0).getTime(); // 9 ноября 2026 (месяцы с 0, поэтому 10)
+    const startDate = new Date(2026, 10, 9, 0, 0).getTime(); 
     const interval = setInterval(() => {
       const now = new Date().getTime();
-      const diff = now - startDate;
+      const diff = Math.abs(now - startDate); // Вот тут Math.abs
       setTime({
         days: Math.floor(diff / (1000 * 60 * 60 * 24)),
         hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
@@ -52,7 +50,6 @@ function LovePageContent() {
     return () => clearInterval(interval);
   }, []);
 
-  // --- 2. ГЕНЕРАТОР ПРИЧИН ---
   const reasons = [
     "За то, как ты меня поддерживаешь, когда всё валится из рук.",
     "За твой смех, который я слышу даже в голове.",
@@ -67,7 +64,6 @@ function LovePageContent() {
     setCurrentReason(reasons[Math.floor(Math.random() * reasons.length)]);
   };
 
-  // --- 3. СЕРДЕЧКИ ПРИ КЛИКЕ ---
   const [hearts, setHearts] = useState<{ id: number; x: number; y: number }[]>([]);
   const handleScreenClick = (e: React.MouseEvent) => {
     const newHeart = { id: Date.now(), x: e.clientX, y: e.clientY };
@@ -75,12 +71,11 @@ function LovePageContent() {
     setTimeout(() => setHearts((prev) => prev.filter((h) => h.id !== newHeart.id)), 1000);
   };
 
-  // --- 4. АНИМАЦИЯ ОБНЯТЬ/ПОЦЕЛОВАТЬ ---
   const [burstAction, setBurstAction] = useState<"hug" | "kiss" | null>(null);
   const [burstPhoto, setBurstPhoto] = useState<string | null>(null);
 
   const triggerAction = async (action: "hug" | "kiss") => {
-    const hugPhotos = ["/hug1.jpg", "/hug2.jpg",];
+    const hugPhotos = ["/hug1.jpg", "/hug2.jpg", "/hug3.jpg"];
     const kissPhotos = ["/kiss1.jpg", "/kiss2.jpg", "/kiss3.jpg"];
     const photos = action === "hug" ? hugPhotos : kissPhotos;
     const randomPhoto = photos[Math.floor(Math.random() * photos.length)];
@@ -89,7 +84,6 @@ function LovePageContent() {
     setBurstAction(action);
     setTimeout(() => { setBurstAction(null); setBurstPhoto(null); }, 3000);
 
-    // ЛОГИКА ОТПРАВКИ: Если зашла Вика, отправляем Дане. И наоборот.
     const target = user === "vika" ? "danya" : "vika";
 
     try {
@@ -101,11 +95,9 @@ function LovePageContent() {
     } catch (e) { console.log("Ошибка отправки", e); }
   };
 
-  // --- 5. ГАЛЕРЕЯ ---
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
   const [isBonusRevealed, setIsBonusRevealed] = useState(false);
 
-  // ТВОИ ФОТОГРАФИИ
   const photos = [
     { url: "/photo4.jpg", caption: "Мой личный гоблин", description: "Ты можешь прятаться в капюшон, но твои глаза все равно выдают, как сильно ты меня любишь.", bonus: "🎁 Бонус: Купон на один расслабляющий массаж спины." },
     { url: "/photo2.jpg", caption: "Тот самый вечер", description: "Ты была самой красивой в тот момент. Я смотрел на тебя и понимал, как мне повезло.", bonus: "🎁 Бонус: Купон на совместный просмотр любого фильма." },
@@ -117,7 +109,6 @@ function LovePageContent() {
     { url: "/photo8.jpg", caption: "Просто мы", description: "С тобой каждый день — праздник.", bonus: "🎁 Бонус: книга твоя)." },
   ];
 
-  // --- 6. ЛОГИКА ПИСЕМ ---
   const [selectedLetter, setSelectedLetter] = useState<keyof typeof LETTERS | null>(null);
   const [printedText, setPrintedText] = useState("");
   const [textIndex, setTextIndex] = useState(0);
@@ -129,7 +120,7 @@ function LovePageContent() {
       const timer = setTimeout(() => {
         setPrintedText(fullText.substring(0, textIndex + 1));
         setTextIndex((prev) => prev + 1);
-      }, 15); // Ускорили печать
+      }, 15);
       return () => clearTimeout(timer);
     }
   }, [selectedLetter, textIndex, fullText]);
@@ -143,7 +134,6 @@ function LovePageContent() {
   return (
     <div className="min-h-screen bg-[#050005] text-pink-400 font-sans overflow-x-hidden relative" onClick={handleScreenClick}>
       
-      {/* ФОН */}
       <div className="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] bg-pink-600/10 blur-[120px] rounded-full pointer-events-none mix-blend-screen"></div>
       <div className="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-600/10 blur-[120px] rounded-full pointer-events-none mix-blend-screen"></div>
 
@@ -165,7 +155,6 @@ function LovePageContent() {
         </div>
       )}
 
-      {/* ТАЙМЕР */}
       <section className="min-h-[90vh] flex flex-col items-center justify-center p-4 relative z-10">
         <h1 className="text-3xl md:text-5xl font-bold text-white mb-10 text-center flex flex-col items-center gap-2">
           Месяц с тобой <Heart className="text-pink-500 fill-pink-500 animate-pulse" size={36} />
@@ -194,7 +183,6 @@ function LovePageContent() {
         </div>
       </section>
 
-      {/* ГАЛЕРЕЯ */}
       <section className="py-20 px-4 relative z-10">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-12 text-center flex items-center justify-center gap-3">
@@ -213,7 +201,6 @@ function LovePageContent() {
         </div>
       </section>
 
-      {/* ГЕНЕРАТОР */}
       <section className="py-20 px-4 flex flex-col items-center justify-center relative z-10">
         <div className="max-w-xl w-full text-center z-10">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-8 flex items-center justify-center gap-3">
@@ -238,7 +225,6 @@ function LovePageContent() {
         </div>
       </section>
 
-      {/* СЕКЦИЯ ПИСЕМ */}
       <section className="py-20 px-4 flex flex-col items-center justify-center relative z-10 border-t border-white/5">
         <div className="text-center mb-10">
           <h2 className="text-2xl md:text-3xl font-bold text-white">Послания для тебя</h2>
@@ -276,9 +262,8 @@ function LovePageContent() {
         <p className="text-pink-500/40 text-xs md:text-sm font-mono tracking-widest uppercase">Made with ❤️ by Danya for Vika</p>
       </footer>
 
-      {/* МОДАЛКА ФОТО */}
       {selectedPhoto && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-lg p-4 animate-in fade-in" onClick={() => { setSelectedPhoto(null); setIsBonusRevealed(false); }}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#050005] p-4 animate-in fade-in" onClick={() => { setSelectedPhoto(null); setIsBonusRevealed(false); }}>
           <div className="relative max-w-2xl w-full flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
             <button onClick={() => { setSelectedPhoto(null); setIsBonusRevealed(false); }} className="absolute -top-12 right-0 text-white/50 hover:text-white bg-white/10 p-2 rounded-full backdrop-blur-md"><X size={20} /></button>
             <img src={selectedPhoto.url} alt="Фото" onClick={() => setIsBonusRevealed(!isBonusRevealed)} className="max-h-[55vh] md:max-h-[60vh] object-contain rounded-2xl border border-white/10 cursor-pointer" />
@@ -292,7 +277,6 @@ function LovePageContent() {
         </div>
       )}
 
-      {/* МОДАЛКА ПИСЕМ */}
       {selectedLetter && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 animate-in fade-in duration-500" onClick={() => setSelectedLetter(null)}>
           <div className="relative max-w-2xl w-full bg-[#120a14] border border-pink-500/30 p-8 md:p-12 rounded-3xl shadow-[0_0_50px_rgba(236,72,153,0.2)] max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
@@ -324,7 +308,6 @@ function LovePageContent() {
   );
 }
 
-// ОБЯЗАТЕЛЬНАЯ ОБЕРТКА ДЛЯ NEXT.JS (чтобы useSearchParams работал)
 export default function LovePage() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-black text-pink-500 flex items-center justify-center">Загрузка...</div>}>
