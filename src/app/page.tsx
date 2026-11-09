@@ -36,10 +36,10 @@ function LovePageContent() {
   const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    const startDate = new Date(2026, 9, 9, 0, 0).getTime(); 
+    const startDate = new Date(2026, 9, 9, 0, 0).getTime(); // 9 октября 2026
     const interval = setInterval(() => {
       const now = new Date().getTime();
-      const diff = Math.abs(now - startDate); // Вот тут Math.abs
+      const diff = Math.abs(now - startDate); 
       setTime({
         days: Math.floor(diff / (1000 * 60 * 60 * 24)),
         hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
@@ -57,7 +57,8 @@ function LovePageContent() {
     "За то, как ты злишься в Роблоксе (это мило).",
     "За твои глаза.",
     "За то, что ты выбрала именно меня.",
-    "За наши ночные разговоры."
+    "За наши ночные разговоры.",
+    "За то, как ты улыбаешься, когда я говорю глупости."
   ];
   const [currentReason, setCurrentReason] = useState("Нажми на кнопку, чтобы узнать...");
   const generateReason = () => {
@@ -75,6 +76,8 @@ function LovePageContent() {
   const [burstPhoto, setBurstPhoto] = useState<string | null>(null);
 
   const triggerAction = async (action: "hug" | "kiss") => {
+    if (burstAction) return; // Защита от спама кликами
+
     const hugPhotos = ["/hug1.jpg", "/hug2.jpg", "/hug3.jpg"];
     const kissPhotos = ["/kiss1.jpg", "/kiss2.jpg", "/kiss3.jpg"];
     const photos = action === "hug" ? hugPhotos : kissPhotos;
