@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     const token = process.env.TELEGRAM_BOT_TOKEN;
 
     if (!token) {
-      console.error("Ошибка: Нет токена в .env.local");
+      console.error("Ошибка: Нет токена в .env");
       return NextResponse.json({ error: 'Ошибка конфигурации' }, { status: 500 });
     }
 
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
         if (data.includes("hug")) {
           replyText = "🤗 Я тоже тебя крепко обнимаю ❤️";
         } else if (data.includes("kiss")) {
-          replyText = "💋 Воздущный поцелуй тебя отправлен 😘";
+          replyText = "💋 Воздушный поцелуй отправлен 😘";
         }
       } else if (data.startsWith("decline")) {
         replyText = "😢 Ну ладно... Но я всё равно тебя люблю ❤️";
@@ -68,21 +68,31 @@ export async function POST(req: Request) {
       let replyText = "";
 
       if (text.startsWith("/start")) {
-        replyText = `Привет, ${senderName}! 👋 Я ваш личный бот. Вот что я умею:\n\n❤️ /love — случайная причина любви\n🤗 /hug — отправить объятия\n📅 /days — сколько вы уже вместе`;
+        replyText = `Привет, ${senderName}! 👋 Я ваш личный бот. Вот что я умею:\n\n❤️ /love — случайная причина любви\n🤗 /hug — отправить объятия\n📅 /days — сколько вы уже вместе\n🕒 /time — узнать текущее время`;
       } else if (text.startsWith("/love")) {
         const randomReason = REASONS[Math.floor(Math.random() * REASONS.length)];
         replyText = `❤️ Причина: ${randomReason}`;
       } else if (text.startsWith("/hug")) {
         replyText = `🤗 ${senderName} отправляет крепкие объятия!`;
       } else if (text.startsWith("/days")) {
-        // ВСТАВЬ СЮДА ДАТУ ВАШЕГО НАЧАЛА (Год, Месяц-1, День)
-        const startDate = new Date(2026, 9, 9, 0, 0).getTime(); // Например: 9 октября
+        // ВСТАВЬ СЮДА ДАТУ ВАШЕГО НАЧАЛА (Год, Месяц-1, День, Часы, Минуты)
+        const startDate = new Date(2026, 9, 9, 0, 0).getTime(); 
         const now = new Date().getTime();
         const diff = Math.abs(now - startDate);
+        
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        replyText = `📅 Вы вместе уже ${days} дней!`;
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        
+        replyText = `📅 Вы вместе уже: ${days} д. ${hours} ч. ${minutes} м.`;
+      
+      } else if (text.startsWith("/time")) {
+        const now = new Date();
+        // Форматируем время в ЧЧ:ММ
+        const timeString = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+        replyText = `🕒 Точное время сейчас: ${timeString}`;
       } else if (text.startsWith("/")) {
-        replyText = "Я не знаю такой команды. Доступные: /start, /love, /hug, /days";
+        replyText = "Я не знаю такой команды. Доступные: /start, /love, /hug, /days, /time";
       } else {
         // Если это просто текст (не команда), бот молчит, чтобы не спамить
         return NextResponse.json({ ok: true });
