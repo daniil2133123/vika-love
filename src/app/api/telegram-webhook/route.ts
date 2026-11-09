@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 
-// Список причин для команды /love
 const REASONS = [
   "За то, как ты меня поддерживаешь, когда всё валится из рук.",
   "За твой смех, который я слышу даже в голове.",
@@ -25,7 +24,7 @@ export async function POST(req: Request) {
     // --- 1. ОБРАБОТКА НАЖАТИЯ КНОПОК (callback_query) ---
     if (body.callback_query) {
       const callbackQuery = body.callback_query;
-      const data = callbackQuery.data; // "accept_hug", "decline_kiss" и т.д.
+      const data = callbackQuery.data;
       const chatId = callbackQuery.message.chat.id;
       const messageId = callbackQuery.message.message_id;
       
@@ -40,14 +39,25 @@ export async function POST(req: Request) {
         replyText = "😢 Ну ладно... Но я всё равно тебя люблю ❤️";
       }
 
-      // Обязательный ответ Телеграму (чтобы кнопка перестала грузиться)
+      // 1. Убираем "крутилку" с кнопки
       await fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ callback_query_id: callbackQuery.id })
       });
 
-      // Отправка ответного сообщения
+      // 2. УДАЛЯЕМ КНОПКИ С СООБЩЕНИЯ (чтобы нельзя было нажать дважды)
+      await fetch(`https://api.telegram.org/bot${token}/editMessageReplyMarkup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          chat_id: chatId, 
+          message_id: messageId,
+          reply_markup: { inline_keyboard: [] }
+        })
+      });
+
+      // 3. Отправляем ответ
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -63,7 +73,7 @@ export async function POST(req: Request) {
       const text = message.text;
       const senderName = message.from?.first_name || "Кто-то";
 
-      if (!text) return NextResponse.json({ ok: true }); // Игнорируем стикеры и фото
+      if (!text) return NextResponse.json({ ok: true });
 
       let replyText = "";
 
@@ -75,8 +85,7 @@ export async function POST(req: Request) {
       } else if (text.startsWith("/hug")) {
         replyText = `🤗 ${senderName} отправляет крепкие объятия!`;
       } else if (text.startsWith("/days")) {
-        // ВСТАВЬ СЮДА ДАТУ ВАШЕГО НАЧАЛА (Год, Месяц-1, День, Часы, Минуты)
-        const startDate = new Date(2026, 9, 9, 0, 0).getTime(); 
+        const startDate = new Date(2026, 9, 9, 0, 0).getTime(); // 9 октября 2026
         const now = new Date().getTime();
         const diff = Math.abs(now - startDate);
         
@@ -88,14 +97,12 @@ export async function POST(req: Request) {
       
       } else if (text.startsWith("/time")) {
         const now = new Date();
-        // Форматируем время в ЧЧ:ММ
         const timeString = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
         replyText = `🕒 Точное время сейчас: ${timeString}`;
       } else if (text.startsWith("/")) {
         replyText = "Я не знаю такой команды. Доступные: /start, /love, /hug, /days, /time";
       } else {
-        // Если это просто текст (не команда), бот молчит, чтобы не спамить
-        return NextResponse.json({ ok: true });
+        return NextResponse.json({ ok: true }); // Игнорируем обычный текст
       }
 
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
