@@ -78,7 +78,7 @@ function LovePageContent() {
   const triggerAction = async (action: "hug" | "kiss") => {
     if (burstAction) return; // Защита от спама кликами
 
-    const hugPhotos = ["/hug1.jpg", "/hug2.jpg", "/hug3.jpg"];
+    const hugPhotos = ["/hug1.jpg", "/hug2.jpg",];
     const kissPhotos = ["/kiss1.jpg", "/kiss2.jpg", "/kiss3.jpg"];
     const photos = action === "hug" ? hugPhotos : kissPhotos;
     const randomPhoto = photos[Math.floor(Math.random() * photos.length)];
